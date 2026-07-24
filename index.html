@@ -47,13 +47,7 @@
       .brand-dot{width:.7rem;height:.7rem;border:1.5px solid #83ded0;border-radius:.25rem;display:flex;align-items:center;justify-content:center}
       .brand-dot span{color:#83ded0;font-size:.4rem}
       .developer{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%);z-index:10;color:#83ded0;font-size:.85rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-shadow:0 0 20px rgba(131,222,208,.4)}
-      .adblock-alert{position:fixed;inset:0;z-index:200;background:rgba(10,15,26,.85);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center}
-      .adblock-box{background:#1a2332;border:1px solid rgba(131,222,208,.2);border-radius:.8rem;padding:2rem 2.5rem;text-align:center;max-width:22rem}
-      .adblock-box p{color:#ff816b;font-size:1.1rem;font-weight:700;margin-bottom:.5rem}
-      .adblock-box span{color:#a6b3ca;font-size:.8rem;display:block;margin-bottom:1.2rem}
-      .adblock-box button{border:0;border-radius:.4rem;padding:.5rem 1.5rem;background:#83ded0;color:#0a0f1a;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit}
       .ad-slot{margin:1rem auto;max-width:468px;min-height:90px;background:rgba(255,255,255,.05);border:1px dashed rgba(131,222,208,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;color:#61718b;font-size:.7rem}
-      .ad-slot-responsive{width:100%}
       .footer{position:fixed;bottom:1rem;left:0;right:0;text-align:center;color:#61718b;font-size:.65rem}
       .loader-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(10,15,26,.92);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
       .loader-overlay.active{display:flex}
@@ -104,14 +98,6 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
 
     <div class="developer">developer : evvv_amine</div>
-
-    <div id="adblock-alert" class="adblock-alert" hidden>
-      <div class="adblock-box">
-        <p>⚠️ AdBlocker detected</p>
-        <span>Please disable your adblocker to support this site.</span>
-        <button onclick="document.getElementById('adblock-alert').hidden=true">OK</button>
-      </div>
-    </div>
 
     <script>
       const urlInput = document.getElementById("url");
@@ -180,20 +166,6 @@
       });
 
       urlInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkBtn.click(); });
-
-      setTimeout(() => {
-        const testAd = document.createElement("div");
-        testAd.innerHTML = "&nbsp;";
-        testAd.className = "adsbox";
-        testAd.style.cssText = "position:absolute;top:-999px;left:-999px;width:1px;height:1px;";
-        document.body.appendChild(testAd);
-        setTimeout(() => {
-          if (testAd.offsetHeight === 0 || testAd.clientHeight === 0 || getComputedStyle(testAd).display === "none") {
-            document.getElementById("adblock-alert").hidden = false;
-          }
-          testAd.remove();
-        }, 100);
-      }, 1500);
     </script>
   </body>
 </html>
