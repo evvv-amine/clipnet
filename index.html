@@ -59,6 +59,12 @@
       .loader-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#83ded0,#ff816b);border-radius:2px;animation:progress 6s ease-in-out forwards}
       @keyframes progress{0%{width:0%}30%{width:40%}60%{width:70%}90%{width:90%}100%{width:98%}}
     </style>
+    <meta name="monetag" content="61ba5fb46d6182d8e1978fb19ea34f0c">
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      }
+    </script>
   </head>
   <body>
     <div class="bg"></div>
