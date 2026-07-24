@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClipNet — Download Videos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0f1a;font-family:"Space Grotesk",sans-serif;color:#eef5ff;overflow:hidden}
+      .bg{position:fixed;inset:0;z-index:0}
+      .bg::before{content:"";position:absolute;width:150%;height:150%;top:-25%;left:-25%;background:radial-gradient(ellipse at 20% 50%,rgba(131,222,208,.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(255,129,107,.06) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(131,222,208,.05) 0%,transparent 50%);animation:bg1 12s ease-in-out infinite alternate}
+      .bg::after{content:"";position:absolute;width:120%;height:120%;top:-10%;left:-10%;background:radial-gradient(circle at 70% 60%,rgba(255,129,107,.05) 0%,transparent 40%),radial-gradient(circle at 30% 30%,rgba(131,222,208,.06) 0%,transparent 40%);animation:bg2 10s ease-in-out infinite alternate-reverse}
+      @keyframes bg1{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(5%,-3%) rotate(2deg)}100%{transform:translate(-3%,5%) rotate(-1deg)}}
+      @keyframes bg2{0%{transform:translate(0,0) scale(1)}50%{transform:translate(-4%,4%) scale(1.05)}100%{transform:translate(3%,-2%) scale(.98)}}
+      .grid{position:fixed;inset:0;background-image:linear-gradient(rgba(131,222,208,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(131,222,208,.03) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%);z-index:0}
+      .scan{position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(131,222,208,.4),transparent);animation:scan 6s linear infinite;opacity:.5;z-index:0}
+      @keyframes scan{0%{top:-2px}100%{top:100%}}
+      .container{position:relative;z-index:1;width:min(100% - 2rem,42rem);text-align:center}
+      h1{font-size:clamp(2rem,6vw,3.5rem);margin-bottom:.5rem;background:linear-gradient(90deg,#fff 40%,#83ded0 50%,#fff 60%);background-size:200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s ease-in-out infinite}
+      @keyframes shimmer{0%{background-position:100%}100%{background-position:-100%}}
+      .subtitle{color:#a6b3ca;font-size:.95rem;margin-bottom:2.5rem}
+      .card{background:rgba(255,255,255,.95);border-radius:.8rem;padding:1.2rem;box-shadow:0 20px 60px rgba(0,0,0,.4);transition:box-shadow .3s,transform .3s}
+      .card:hover{box-shadow:0 20px 70px rgba(131,222,208,.15),0 20px 60px rgba(0,0,0,.4);transform:translateY(-2px)}
+      label{display:block;text-align:left;font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#516078;padding:.1rem .35rem .4rem}
+      .row{display:flex;gap:.5rem}
+      .input-wrap{flex:1;display:flex;align-items:center;gap:.6rem;padding:0 .85rem;background:#fff;border:1px solid #d4dce7;border-radius:.5rem;transition:border .2s,box-shadow .2s}
+      .input-wrap:focus-within{border-color:#55bcb0;box-shadow:0 0 0 3px rgba(131,222,208,.26)}
+      .input-wrap svg{width:1.1rem;color:#7d8ba0;flex:none}
+      .input-wrap input{width:100%;padding:.8rem 0;border:0;outline:0;font-size:.9rem;font-family:inherit;color:#18233a}
+      .input-wrap input::placeholder{color:#95a1b5}
+      .btn{border:0;border-radius:.5rem;padding:.8rem 1.2rem;background:#ff816b;color:#31120e;font-weight:700;font-size:.9rem;font-family:inherit;cursor:pointer;transition:background .2s,transform .2s;box-shadow:0 0 0 0 rgba(255,129,107,0);animation:btnPulse 3s ease-in-out infinite}
+      .btn:hover{background:#ff9a87;transform:translateY(-1px);box-shadow:0 8px 25px rgba(255,129,107,.35)}
+      .btn:disabled{opacity:.5;cursor:wait;transform:none;animation:none}
+      @keyframes btnPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,129,107,0)}50%{box-shadow:0 0 0 6px rgba(255,129,107,.15)}}
+      .note{margin:.5rem .3rem 0;color:#66758d;font-size:.65rem}
+      .error{margin-top:.8rem;padding:.6rem .8rem;background:#ffede9;color:#893524;border-radius:.4rem;font-size:.8rem;text-align:left}
+      .formats{margin-top:.8rem;display:flex;flex-direction:column;gap:.35rem}
+      .fmt{display:flex;align-items:center;justify-content:space-between;padding:.55rem .7rem;background:#ecfaf7;border:1px solid #c7eae3;border-radius:.4rem;transition:transform .2s,border-color .2s}
+      .fmt:hover{transform:translateX(4px);border-color:rgba(131,222,208,.4)}
+      .fmt span{font-size:.8rem;color:#153840}
+      .dl-btn{padding:.45rem .7rem;background:#2e8077;color:#fff;border:none;border-radius:.35rem;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;text-decoration:none}
+      .dl-btn:hover{background:#246960}
+      .brand{position:fixed;top:1.2rem;left:1.5rem;display:flex;align-items:center;gap:.5rem;color:#fff;font-weight:700;font-size:1rem;text-decoration:none}
+      .brand-dot{width:.7rem;height:.7rem;border:1.5px solid #83ded0;border-radius:.25rem;display:flex;align-items:center;justify-content:center}
+      .brand-dot span{color:#83ded0;font-size:.4rem}
+      .footer{position:fixed;bottom:1rem;left:0;right:0;text-align:center;color:#61718b;font-size:.65rem}
+      .loader-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(10,15,26,.92);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+      .loader-overlay.active{display:flex}
+      .loader{width:3.5rem;height:3.5rem;border:3px solid rgba(131,222,208,.15);border-top-color:#83ded0;border-radius:50%;animation:spin .8s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      .loader-text{color:#c8d5e7;font-size:.95rem}
+      .loader-sub{color:#61718b;font-size:.7rem}
+      .loader-progress{width:12rem;height:3px;background:rgba(131,222,208,.15);border-radius:2px;overflow:hidden}
+      .loader-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#83ded0,#ff816b);border-radius:2px;animation:progress 6s ease-in-out forwards}
+      @keyframes progress{0%{width:0%}30%{width:40%}60%{width:70%}90%{width:90%}100%{width:98%}}
+    </style>
+  </head>
+  <body>
+    <div class="bg"></div>
+    <div class="grid"></div>
+    <div class="scan"></div>
+
+    <a class="brand" href="/"><div class="brand-dot"><span>C</span></div>clipnet</a>
+
+    <div class="loader-overlay" id="loader">
+      <div class="loader"></div>
+      <div class="loader-text">Preparing your download…</div>
+      <div class="loader-progress"><div class="loader-progress-bar"></div></div>
+    </div>
+
+    <div class="container">
+      <h1>Download any video</h1>
+      <p class="subtitle">Paste a YouTube link, pick a quality, save it.</p>
+      <div class="card">
+        <label for="url">Video link</label>
+        <div class="row">
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.5 13.5a4.24 4.24 0 0 0 6 .08l2.25-2.25a4.24 4.24 0 0 0-6-6l-1.29 1.28"/><path d="M13.5 10.5a4.24 4.24 0 0 0-6-.08l-2.25 2.25a4.24 4.24 0 0 0 6 6l1.28-1.28"/></svg>
+            <input id="url" type="url" placeholder="Paste YouTube link here…" required />
+          </div>
+          <button class="btn" id="checkBtn">Check →</button>
+        </div>
+        <p class="note">Only YouTube links. Download only videos you own or have permission to save.</p>
+        <div id="error" class="error" hidden></div>
+        <div id="formats" class="formats" hidden></div>
+      </div>
+    </div>
+
+    <div class="footer">developer : evvv_amine</div>
+
+    <script>
+      const urlInput = document.getElementById("url");
+      const checkBtn = document.getElementById("checkBtn");
+      const errorEl = document.getElementById("error");
+      const formatsEl = document.getElementById("formats");
+      const loader = document.getElementById("loader");
+
+      const qualities = [
+        { label: "1080p · MP4", quality: "1080" },
+        { label: "720p · MP4", quality: "720" },
+        { label: "480p · MP4", quality: "480" },
+        { label: "360p · MP4", quality: "360" },
+      ];
+
+      function showError(msg) { errorEl.textContent = msg; errorEl.hidden = false; formatsEl.hidden = true; }
+      function hideError() { errorEl.hidden = true; }
+
+      function showLoader() { loader.classList.add("active"); }
+      function hideLoader() { loader.classList.remove("active"); }
+
+      function extractVideoId(url) {
+        const patterns = [
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+          /^([a-zA-Z0-9_-]{11})$/
+        ];
+        for (const p of patterns) {
+          const m = url.match(p);
+          if (m) return m[1];
+        }
+        return null;
+      }
+
+      checkBtn.addEventListener("click", () => {
+        const url = urlInput.value.trim();
+        if (!url) { showError("Paste a link first."); return; }
+        const videoId = extractVideoId(url);
+        if (!videoId) { showError("Invalid YouTube link."); return; }
+
+        hideError();
+        formatsEl.hidden = true;
+        checkBtn.disabled = true;
+        checkBtn.textContent = "Checking…";
+        showLoader();
+
+        setTimeout(() => {
+          hideLoader();
+          checkBtn.disabled = false;
+          checkBtn.textContent = "Check →";
+          const thumbUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+
+          formatsEl.hidden = false;
+          formatsEl.innerHTML = `
+            <div style="display:flex;align-items:center;gap:.7rem;padding:.6rem;background:#ecfaf7;border:1px solid #c7eae3;border-radius:.5rem;margin-bottom:.5rem">
+              <img src="${thumbUrl}" alt="" style="width:5rem;height:3rem;object-fit:cover;border-radius:.3rem;background:#bed1d5" onerror="this.style.display='none'" />
+              <strong style="font-size:.85rem;color:#153840;flex:1;text-align:left">YouTube Video</strong>
+            </div>
+            ${qualities.map((q) => `
+              <div class="fmt">
+                <span>${q.label}</span>
+                <a class="dl-btn" href="https://www.y2mate.com/youtube/${videoId}" target="_blank" rel="noopener">Download ↓</a>
+              </div>
+            `).join("")}
+          `;
+        }, 2500);
+      });
+
+      urlInput.addEventListener("keydown", (e) => { if (e.key === "Enter") checkBtn.click(); });
+    </script>
+  </body>
+</html>
